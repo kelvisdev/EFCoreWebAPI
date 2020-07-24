@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EFCore.Dominio;
 using EFCore.Repo;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EFCore.WebAPI.Controllers
 {
@@ -24,14 +25,15 @@ namespace EFCore.WebAPI.Controllers
         {
             // LINQ Method
             var listHeroi = _context.Herois
-                .Where(h => h.Nome.Contains(nome))
-                .ToList();
+                .Where(h => EF.Functions.Like(h.Nome, $"%{nome}%"))
+                .OrderBy(h => h.Id)
+                .LastOrDefault();
 
             // LINQ Queries
-            var listHeroi2 = (from heroi in _context.Herois
-                             where heroi.Nome.Contains(nome)
-                             select heroi)
-                             .ToList();
+            //var listHeroi2 = (from heroi in _context.Herois
+            //                 where heroi.Nome.Contains(nome)
+            //                 select heroi)
+            //                 .ToList();
 
             foreach (var item in _context.Herois)
             {
