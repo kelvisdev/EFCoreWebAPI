@@ -19,23 +19,62 @@ namespace EFCore.WebAPI.Controllers
         }
 
         // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        [HttpGet("filtro/{nome}")]
+        public ActionResult GetFiltro(string nome)
         {
-            return new string[] { "value1", "value2" };
+            // LINQ Method
+            var listHeroi = _context.Herois
+                .Where(h => h.Nome.Contains(nome))
+                .ToList();
+
+            // LINQ Queries
+            var listHeroi2 = (from heroi in _context.Herois
+                             where heroi.Nome.Contains(nome)
+                             select heroi)
+                             .ToList();
+
+            foreach (var item in _context.Herois)
+            {
+                // ....
+            }
+
+            return Ok(listHeroi);
         }
 
         // GET api/values/5
-        [HttpGet("{nameHero}")]
+        [HttpGet("Atualizar/{nameHero}")]
         public ActionResult<string> Get(string nameHero)
         {
-            var heroi = new Heroi { Nome = nameHero };
-            
-            _context.Herois.Add(heroi);
+            // var heroi = new Heroi { Nome = nameHero };
+
+            var heroi = _context.Herois
+                .Where(h => h.Id == 3)
+                .FirstOrDefault();
+
+            heroi.Nome = "Homem Aranha";
+
+            // _context.Herois.Add(heroi);
             // _context.Add(heroi);
             _context.SaveChanges();
             
             return Ok(); 
+        }
+
+        [HttpGet("AddRange")]
+        public ActionResult<string> GetAddRange()
+        {
+            _context.AddRange(
+                new Heroi { Nome = "Doutor Estranho" },
+                new Heroi { Nome = "Pantera Negra" },
+                new Heroi { Nome = "Viúva Negra" },
+                new Heroi { Nome = "Hulk" },
+                new Heroi { Nome = "Gavião Arqueiro" },
+                new Heroi { Nome = "Capitã Marvel" }
+            );
+
+            _context.SaveChanges();
+
+            return Ok();
         }
 
         // POST api/values
@@ -51,9 +90,15 @@ namespace EFCore.WebAPI.Controllers
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
+        [HttpGet("Delete/{id}")]
         public void Delete(int id)
         {
+            var heroi = _context.Herois
+                            .Where(x => x.Id == id)
+                            .Single();
+
+            _context.Herois.Remove(heroi);
+            _context.SaveChanges();
         }
     }
 }
